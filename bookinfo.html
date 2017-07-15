@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css/booklist.css" />
+		<link rel="stylesheet" href="css/font-awesome-ie7.min.css" />
+		<link rel="stylesheet" href="css/font-awesome.min.css" />
+		<link rel="stylesheet" href="css/bookinfo.css" />
+		<script type="text/javascript" src="js/main.js" ></script>
+		<script type="text/javascript" src="js/md5.js" ></script>
+		<script type="text/javascript" src="js/jquery-min.js" ></script>
+		<script type="text/javascript" src="js/loginswich.js" ></script>
+		<script type="text/javascript" src="js/bookinfo.js" ></script>
+		<title>图书-详情页</title>
+	</head>
+	<script type="text/javascript">
+		get_recommend_list();
+		var score=0;
+		var bookId=GetQueryString("bookId");
+		var sessionId=document.cookie;
+		sessionId=sessionId.substring(14,sessionId.length);
+		function add0(m){return m<10?'0'+m:m }
+		function format(shijianchuo)
+		{
+			//shijianchuo是整数，否则要parseInt转换
+			var time = new Date(shijianchuo);
+			var y = time.getFullYear();
+			var m = time.getMonth()+1;
+			var d = time.getDate();
+			var h = time.getHours();
+			var mm = time.getMinutes();
+			var s = time.getSeconds();
+			return y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);
+		}
+		function searchkeyword(){
+			$("#author").val("");
+			$("#press").val("");
+			$("#keyword").val($("#keyword_dir").text());
+			$("#form").submit();
+		}
+		function searchauthor(){
+			$("#keyword").val("");
+			$("#press").val("");
+			$("#author").val($("#author_dir").text());
+			$("#form").submit();
+		}
+		function searchpress(){
+			$("#keyword").val("");
+			$("#author").val("");
+			$("#press").val($("#press_dir").text());
+			$("#form").submit();
+		}
+		 $(function(){
+		 	$(".copy-right p").text(footer);
+			$(".pin-logo p").text(web_title);
+			getusername(sessionId,'','','');
+		 	var commentpage=$("#commentpage").val();
+		 	var needlines=$("#needlines").val();
+		 	var commentlist=getcomment(bookId,commentpage,needlines);
+		 	$.ajax({
+		 		type:"post",
+		 		url:url+"/opac/bookinfo",
+		 		data:"id="+bookId,
+		 		async:false,
+		 		dataType: 'json',
+    			success: function(data, textStatus, jqXHR){
+    				if(data.code=="1"){
+    					alert(data.message);
+    				}
+    				else if(data.code=="0"){
+    					console.log(data);
+    					var bookinfo=data.fullBookInfo;
+    					var bookurllist=data.bookUrlList;
+    					console.log(bookurllist);
+    					document.title=bookinfo.title+"-详情页";
+    					var book_information="";
+    					var commentinfo="";
+    					book_information=book_information+'<div class="book-img">\
+						<a class="J-getJumpUrl">\
+							<img src="';
+						if(bookinfo.imgPath!=''&&bookinfo.imgPath!=null){
+							book_information=book_information+getimgurl(bookinfo.imgPath);
+						}
+						else{
+							book_information=book_information+"img/150.jpg";
+						}
+						book_information=book_information+'" />\
+						</a>\
+					</div>\
+					<div class="book-info">\
+						<h1>\
+							<em style="max-width: 550px;">'+bookinfo.title+'</em>\
+							<span>\
+								<label>'+bookinfo.author+'</label>\
+							</span>\
+						</h1>\
+						<p class="tag">';
+						if((bookinfo.tag!=''&&bookinfo.tag!=null)||(bookinfo.keyword!=''&&bookinfo.keyword!=null)){
+							if(bookinfo.tag!=''&&bookinfo.tag!=null){
+								book_information=book_information+'<span class="blue">'+bookinfo.tag+'</span>';
+							}
+							if(bookinfo.keyword!=''&&bookinfo.keyword!=null){
+								book_information=book_information+'<span class="red">'+bookinfo.keyword+'</span>';
+							}
+						}
+						book_information=book_information+'</p>\
+						<p class="intro">';
+						if(bookinfo.summary!=null&&bookinfo.summary!=""){
+							book_information=book_information+bookinfo.summary;
+						}
+						book_information=book_information+'</p>\
+						<p>\
+							<em>';
+							if(bookinfo.heat!=''&&bookinfo.heat!=null){
+								book_information=book_information+bookinfo.heat;	
+							}
+							else{
+								book_information=book_information+"0";
+							}
+							book_information=book_information+'</em>\
+							<cite>点击量</cite>\
+							<i>|</i>\
+							<em>';
+							if(bookinfo.readNumber!=''&&bookinfo.readNumber!=null){
+								book_information=book_information+bookinfo.readNumber;
+							}
+							else{
+								book_information=book_information+"0";
+							}
+							book_information=book_information+'</em>\
+							<cite>阅读量</cite>\
+						</p>\
+						<p>';
+						if(bookurllist.length!=0){
+							for(var i=0;i<bookurllist.length;i++){
+								book_information=book_information+'<a target="_blank" class="red-btn" href="'+bookurllist[i].url+'">'+bookurllist[i].vendorName+'</a>';
+							}
+						}
+						else{
+							$.ajax({
+								type:"post",
+								url:url+"/client/IsRecommend",
+								async:false,
+								data:"id="+bookId+"&UserSessionId="+sessionId,
+								dataType:"json",
+								success:function(data){
+									if(data.code=="3"){
+										book_information=book_information+'<a class="red-btn">\
+																<em class="iconfont">\
+																	<i class="icon-thumbs-up"></i>\
+																</em>\
+																<b>'+data.count+'</b>\
+																您已推荐</a>';
+									}
+									else{
+										book_information=book_information+'<a class="red-btn" href="javascript:commentbook();">\
+																<em class="iconfont">\
+																	<i class="icon-thumbs-up"></i>\
+																</em>\
+																<b>'+data.count+'</b>\
+																推荐此书</a>';
+									}
+								}
+							});
+						}
+						book_information=book_information+'</p>\
+					</div>\
+					<div class="comment-wrap">\
+						<div id="commentWrap">\
+							<div class="j_getData">\
+								<h4 id="j_bookScore">\
+									<span>\
+										<cite>'+data.rating/10+'</cite>\
+									</span>\
+								</h4>\
+								<p id="j_userCount">\
+									<span>';
+									if((commentlist.totalCount==0&&commentlist.code==0)||commentlist.code==1){
+										book_information=book_information+'0</span>条评论';
+										commentinfo='<div class="no-data">\
+												<span></span>\
+												<p>还没有评价<i>·</i>快来抢沙发\
+												</p>\
+											</div>';
+									}
+									else if(commentlist.totalCount!=0&&commentlist.code==0){
+										book_information=book_information+commentlist.totalCount+'</span>条评论';
+										commentinfo=creatcommentlist(commentlist,$("#needlines").val());
+										/*commentinfo='<dl>';
+										var result=commentlist.result;
+										for(var i=0;i<result.length;i++){
+											commentinfo=commentinfo+'<dd>\
+													<div class="comment-info">\
+														<h6>\
+															<a class="zan">\
+																<b>'+result[i].votecount+'</b>\
+																<em class="iconfont">\
+																	<i class="icon-thumbs-up"></i>\
+																</em>\
+															</a>\
+															<a class="blue">'+result[i].userName+'</a>\
+															<i>评</i>\
+															<span class="score-min star'+result[i].rating+'"></span>\
+														</h6>\
+														<p class="normal">'+result[i].content+'</p>\
+														<p>'+format(result[i].time)+'</p>\
+													</div>\
+												</dd>';
+										}
+										commentinfo=commentinfo+'</dl>';
+										var totalpage=parseInt(commentlist.totalCount/1);
+				    					if(commentlist.totalCount%1!=0){
+				    						totalpage=totalpage+1;
+				    					}
+				    					var nowpage = commentlist.currentPage;
+				    					var pageinfo='<div class="page-box cf">\
+												<div class="pagination fr" id="page-container">\
+													<div class="lbf-pagination">\
+														<ul class="lbf-pagination-item-list" id="page-index">';
+				    					if(totalpage>=nowpage){
+				    						if(nowpage==1){
+				    							if((totalpage-nowpage)<=5){
+				    								pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-prev lbf-pagination-disabled"><</a>\
+													</li>\
+													<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page  lbf-pagination-current">1</a>\
+													</li>';
+													for(var i=2;i<=totalpage;i++){
+														pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page" href="javascript:changepageinfo('+i+')">'+i+'</a>\
+													</li>';
+													}
+													if(totalpage!=1){
+														pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-next" href="javascript:nextpage();">></a>\
+													</li>';
+													}
+													else{
+														pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-next lbf-pagination-disabled">></a>\
+													</li>';
+													}
+				    							}
+				    							else{
+				    								pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-prev lbf-pagination-disabled"><</a>\
+													</li>\
+													<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page  lbf-pagination-current">1</a>\
+													</li>';
+													for(var i=2;i<=6;i++){
+														pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page" href="javascript:changepageinfo('+i+')">'+i+'</a>\
+													</li>';
+													}
+													pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<span class="lbf-pagination-ellipsis">...</span>\
+													</li>\
+													<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page" href="javascript:changepageinfo('+totalpage+')">'+totalpage+'</a>\
+													</li>\
+													<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-next" href="javascript:nextpage();">></a>\
+													</li>';
+				    							}
+				    						}
+				    						else if(nowpage<=(totalpage-3)&&nowpage>1&&totalpage>6){
+				    							pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-prev" href="javascript:prepage();"><</a>\
+													</li>';
+				    							if(nowpage<5){
+				    								for(var i=1;i<6;i++){
+				    									if(i==nowpage){
+				    										pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page  lbf-pagination-current">'+i+'</a>\
+													</li>';
+				    									}
+				    									else{
+				    										pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page" href="javascript:changepageinfo('+i+')">'+i+'</a>\
+													</li>';
+				    									}
+				    								}
+				    							}
+				    							else{
+				    								pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page" href="javascript:changepageinfo(1)">1</a>\
+													</li>\
+													<li class="lbf-pagination-item">\
+														<span class="lbf-pagination-ellipsis">...</span>\
+													</li>';
+													for(var i=nowpage-2;i<=parseInt(nowpage)+2;i++){
+														if(i==nowpage){
+				    										pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page  lbf-pagination-current">'+i+'</a>\
+													</li>';
+				    									}
+				    									else{
+				    										pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page" href="javascript:changepageinfo('+i+')">'+i+'</a>\
+													</li>';
+				    									}
+													}
+				    							}
+				    							pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<span class="lbf-pagination-ellipsis">...</span>\
+													</li>\
+													<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page" href="javascript:changepageinfo('+totalpage+')">'+totalpage+'</a>\
+													</li>\
+													<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-next" href="javascript:nextpage();">></a>\
+													</li>';
+				    						}
+				    						else if(nowpage>(totalpage-3)&&(nowpage<=totalpage)&&totalpage>6){
+				    							pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-prev" href="javascript:prepage();"><</a>\
+													</li>\
+													<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page" href="javascript:changepageinfo(1)">1</a>\
+													</li>\
+													<li class="lbf-pagination-item">\
+														<span class="lbf-pagination-ellipsis">...</span>\
+													</li>';
+												for(var i=totalpage-3;i<=totalpage;i++){
+													if(i==nowpage){
+				    										pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page  lbf-pagination-current">'+i+'</a>\
+													</li>';
+				    									}
+				    									else{
+				    										pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page" href="javascript:changepageinfo('+i+')">'+i+'</a>\
+													</li>';
+				    									}
+												}
+												if(nowpage!=totalpage){
+													pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-next" href="javascript:nextpage();">></a>\
+													</li>';
+												}
+												else{
+													pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-next lbf-pagination-disabled">></a>\
+													</li>';
+												}
+				    						}
+				    						else if(totalpage<=6){
+				    							pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-prev" href="javascript:prepage();"><</a>\
+													</li>\
+													<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page" href="javascript:changepageinfo(1)">1</a>\
+													</li>';
+												for(var i=2;i<=totalpage;i++){
+													if(i==nowpage){
+				    										pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page  lbf-pagination-current">'+i+'</a>\
+													</li>';
+				    									}
+				    									else{
+				    										pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-page" href="javascript:changepageinfo('+i+')">'+i+'</a>\
+													</li>';
+				    									}
+												}
+												if(nowpage!=totalpage){
+													pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-next" href="javascript:nextpage();">></a>\
+													</li>';
+												}
+												else{
+													pageinfo=pageinfo+'<li class="lbf-pagination-item">\
+														<a class="lbf-pagination-next lbf-pagination-disabled">></a>\
+													</li>';
+												}
+				    						}
+				    					}
+										commentinfo=commentinfo+pageinfo+'</ul>\
+													</div>\
+												</div>\
+											</div>';*/
+									}
+								book_information=book_information+'</p>\
+							</div>\
+						</div>\
+						<h5>我要评价</h5>\
+						<div class="score-mid" style="cursor: pointer; width: 116px;">\
+							<img src="img/star-off.png" alt="1"/>\
+							<img src="img/star-off.png" alt="2"/>\
+							<img src="img/star-off.png" alt="3"/>\
+							<img src="img/star-off.png" alt="4"/>\
+							<img src="img/star-off.png" alt="5"/>\
+						</div>\
+					</div>';
+					$(book_information).appendTo("#book-information");
+					var book_info_detil="";
+					book_info_detil=book_info_detil+'<div class="book-intro">\
+								<p>&nbsp;&nbsp;';
+								if(bookinfo.summary!=null&&bookinfo.summary!=""){
+									book_info_detil=book_info_detil+bookinfo.summary;
+								}
+								book_info_detil=book_info_detil+'</p>\
+							</div>\
+							<div class="book-state">\
+								<ul>';
+								if(bookinfo.title!=null&&bookinfo.title!=''){
+									book_info_detil=book_info_detil+'<li class="language">\
+										<b>书名</b>\
+										<div class="detail">\
+											<a href="javascript:searchkeyword()" id="keyword_dir" style="text-decoration:underline">'+bookinfo.title+'</a>\
+										</div>\
+									</li>';
+								}
+								if(bookinfo.filtAuthor!=null&&bookinfo.filtAuthor!=''){
+									book_info_detil=book_info_detil+'<li>\
+										<b>作者</b>\
+										<div class="detail">\
+											<a href="javascript:searchauthor()" id="author_dir" style="text-decoration:underline">'+bookinfo.filtAuthor+'</a>\
+										</div>\
+									</li>';
+								}
+								if(bookinfo.language!=null&&bookinfo.language!=''){
+									book_info_detil=book_info_detil+'<li>\
+										<b>语种</b>\
+										<div class="detail">\
+											<strong>'+bookinfo.language+'</strong>\
+										</div>\
+									</li>';
+								}
+								if(bookinfo.press!=null&&bookinfo.press!=''){
+									book_info_detil=book_info_detil+'<li>\
+										<b>出版社</b>\
+										<div class="detail">\
+											<a href="javascript:searchpress()" id="press_dir" style="text-decoration:underline">'+bookinfo.press+'</a>\
+										</div>\
+									</li>';
+								}
+								if(bookinfo.pubDate!=null&&bookinfo.pubDate!=''){
+									book_info_detil=book_info_detil+'<li>\
+										<b>出版日期</b>\
+										<div class="detail">\
+											<strong>'+bookinfo.pubDate+'</strong>\
+										</div>\
+									</li>';
+								}
+								if(bookinfo.pubNo!=null&&bookinfo.pubNo!=''){
+									book_info_detil=book_info_detil+'<li>\
+										<b>版号</b>\
+										<div class="detail">\
+											<strong>'+bookinfo.pubNo+'</strong>\
+										</div>\
+									</li>';
+								}
+								if(bookinfo.pages!=null&&bookinfo.pages!=''){
+									book_info_detil=book_info_detil+'<li>\
+										<b>页数</b>\
+										<div class="detail">\
+											<strong>'+bookinfo.pages+'</strong>\
+										</div>\
+									</li>';
+								}
+								if(bookinfo.isbnNum!=null&&bookinfo.isbnNum.length!=0){
+									book_info_detil=book_info_detil+'<li>\
+										<b>ISBN</b>\
+										<div class="detail">\
+											<strong>'+bookinfo.isbnNum[0]+'</strong>\
+										</div>\
+									</li>';
+								}
+								if(bookinfo.type!=null&&bookinfo.type!=''){
+									book_info_detil=book_info_detil+'<li>\
+										<b>类目</b>\
+										<div class="detail">\
+											<strong>'+bookinfo.type+'</strong>\
+										</div>\
+									</li>';
+								}
+								if(bookinfo.keyword!=null&&bookinfo.keyword!=''){
+									book_info_detil=book_info_detil+'<li>\
+										<b>关键词</b>\
+										<div class="detail">\
+											<strong>'+bookinfo.keyword+'</strong>\
+										</div>\
+									</li>';
+								}
+								book_info_detil=book_info_detil+'</ul>\
+							</div>';
+							$(book_info_detil).appendTo("#book-info-detail");
+							$(commentinfo).appendTo("#comment-list");
+							score=Math.round(data.rating/10);
+							$(".score-mid img").slice(0, score).attr("src","img/star-on.png");
+    				}
+    			}
+		 	});
+		 	var num=1;
+		 	 $(".score-mid img").mouseover(function(){
+		 	 	if(num==1){
+		 	 		$(this).prevAll().andSelf().attr("src","img/star-on.png");
+		 	 		num++;
+		 	 	}
+		 	 	if(num==2){
+		 	 		$(this).nextAll().attr("src","img/star-off.png");
+		 	 		num--;
+		 	 	}
+		 	 });
+		 	  $(".score-mid").mouseleave(function(){
+		 	  	if(clicknum==0){
+		 	  		$(this).find('img').attr("src","img/star-off.png");
+		 	  		$(".score-mid img").slice(0, score).attr("src","img/star-on.png");
+		 	  	}
+		 	 });
+		 	  $(".score-mid img").click(function(){
+		 	  	$(this).prevAll().andSelf().attr("src","img/star-on.png");
+		 	  	clicknum=$(this).attr("alt");
+		 	  	gocomment();
+		 	  });
+		 });
+	</script>
+	<body style="zoom: 1;">
+		<form id="dir_form" action="recommend_booklist.html">
+			<input type="text" name="rdId" value="" id="rdId" style="display: none;"/>
+			<input type="text" name="page" value="1" style="display: none;"/>
+			<input type="text" name="needlines" value="10" style="display: none;"/>
+		</form>
+		<form name="form" id="form" action="booklist.html" target="_blank">
+			<input type="hidden" name="keyword" id="keyword" value=""/>
+			<input type="hidden" name="author" id="author" value=""/>
+			<input type="hidden" name="press" id="press" value=""/>
+			<input type="hidden" name="dateStart" value=""/>
+			<input type="hidden" name="dateEnd" value=""/>
+			<input type="hidden" name="page" value="1"/>
+			<input type="hidden" name="mode" value="jsonlist"/>
+			<input type="hidden" name="needlines" value="10"/>
+			<input type="hidden" name="vid" value=""/>
+			<input type="hidden" name="havSrcData" value=""/>
+		</form>
+		<div class="wrap">
+			<div id="pin-nav" class="pin-nav-wrap need-search" data-l1="40" style="margin-bottom: 16px;">
+    			<div class="box-center cf">
+        			<div class="nav-list site-nav fl">
+            			<ul>
+                			<li class="site"><a class="pin-logo" data-eid="qd_A43" href="search.html"><p></p></a>
+                			</li>  
+            			</ul>
+        			</div>
+        			<div class="nav-list min-user fr">
+           				 <ul>
+                			<li class="line"></li>
+               				 <!-- 未登录 -->
+               				<li class="sign-out">
+                    			<a id="pin-login" href="javascript:openlogin();" data-eid="qd_A64">登录</a>
+               			 	</li>
+               				 <!-- 登录后 -->
+                			<li class="sign-in hidden">
+                    		<a href="" target="_blank" data-eid="qd_A65">
+                    			<i id="nav-user-name"></i>
+                    			<i id="nav-user-id" style="display: none;"></i>
+                    			<span></span>
+                    		</a>
+                    		<div class="dropdown">
+                    			<a href="javascript:gogetlib_account();">绑定身份</a>
+                    			<a href="javascript:logout();">退出</a>
+                    		</div>
+                			</li>
+                			<li class="line"></li>
+            			</ul>
+        			</div>
+    			</div>
+			</div>
+			<div class="border-shadow ">
+				<span></span>
+				<span></span>
+			</div>
+			<div class="book-detail-wrap center990">
+				<div class="book-information cf" data-l1="2" id="book-information">
+					<!--<div class="book-img">
+						<a class="J-getJumpUrl">
+							<img src="img/150.jpg" />
+						</a>
+					</div>
+					<div class="book-info">
+						<h1>
+							<em style="max-width: 550px;">1个月颠覆大英六级阅读30天</em>
+							<span>
+								<label>李博,李培主编</label>
+							</span>
+						</h1>
+						<p class="tag">
+							<span class="blue">连载</span>
+							<span class="red">免费</span>
+						</p>
+						<p class="intro">
+							修仙觅长生，热血任逍遥，踏莲曳波涤剑骨，凭虚御风塑圣魂！修仙觅长生，热血任逍遥，踏莲曳波涤剑骨，凭虚御风塑圣魂！修仙觅长生，热血任逍遥，踏莲曳波涤剑骨，凭虚御风塑圣魂！
+						</p>
+						<p>
+							<em>5</em>
+							<cite>点击量</cite>
+							<i>|</i>
+							<em>5</em>
+							<cite>阅读量</cite>
+						</p>
+						<p>
+							<a class="red-btn" href="#">阅读链接1111</a>
+							<a class="red-btn" href="#">阅读链接1111</a>
+							<a class="red-btn" href="#">阅读链接1111</a>
+							<a class="red-btn" href="#">阅读链接1111</a>
+							<a class="red-btn" href="#">阅读链接1111</a>
+							<a class="red-btn" href="#">阅读链接1111</a>
+						</p>
+					</div>
+					<div class="comment-wrap">
+						<div id="commentWrap">
+							<div class="j_getData">
+								<h4 id="j_bookScore">
+									<span>
+										<cite>4.3</cite>
+									</span>
+								</h4>
+								<p id="j_userCount">
+									<span>6</span>条评论
+								</p>
+							</div>
+						</div>
+						<h5>我要评价</h5>
+						<div class="score-mid" style="cursor: pointer; width: 116px;">
+							<img src="img/star-off.png" alt="1"/>
+							<img src="img/star-off.png" alt="2"/>
+							<img src="img/star-off.png" alt="3"/>
+							<img src="img/star-off.png" alt="4"/>
+							<img src="img/star-off.png" alt="5"/>
+						</div>
+					</div>-->
+				</div>
+				<div class="content-nav-wrap cf">
+					<div class="nav-wrap f1">
+						<ul>
+							<li>书本信息</li>
+						</ul>
+					</div>
+				</div>
+				<div class="book-content-wrap cf">
+					<div class="left-wrap f1">
+						<div class="book-info-detail" id="book-info-detail">
+							<!--<div class="book-intro">
+								<p>&nbsp;&nbsp;鹰击长空，鱼跃龙门，熊咆虎啸，万物皆有灵。末法之极，磁极轮转，世界变迁。曾经那个熟悉的世界，已经变得面目全非。
+									<br>&nbsp;&nbsp;当神话变成现实，当传说不再神秘，世界无疆，热血永恒。</p>
+							</div>
+							<div class="book-state">
+								<ul>
+									<li class="language">
+										<b>语种</b>
+										<div class="detail">
+											<strong>中文</strong>
+										</div>
+									</li>
+									<li>
+										<b>出版社</b>
+										<div class="detail">
+											<strong>科学技术文献出版社</strong>
+										</div>
+									</li>
+									<li>
+										<b>出版日期</b>
+										<div class="detail">
+											<strong>2005</strong>
+										</div>
+									</li>
+									<li>
+										<b>版号</b>
+										<div class="detail">
+											<strong>第四版</strong>
+										</div>
+									</li>
+									<li>
+										<b>页数</b>
+										<div class="detail">
+											<strong>1000</strong>
+										</div>
+									</li>
+									<li>
+										<b>ISBN</b>
+										<div class="detail">
+											<strong>[7502333029]</strong>
+										</div>
+									</li>
+									<li>
+										<b>类目</b>
+										<div class="detail">
+											<strong>科学技术文献出版社</strong>
+										</div>
+									</li>
+									<li>
+										<b>关键词</b>
+										<div class="detail">
+											<strong>科学技术文献出版社</strong>
+										</div>
+									</li>
+								</ul>
+							</div>-->
+						</div>
+						<div class="user-commentWrap">
+							<div class="user-comment-wrap book-friend">
+								<div class="comment-head cf">
+									<h3 class="lang">
+										<a class="comment-btn blue j_commentBtn" href="javascript:gocomment();">我要评价</a>
+										<span class="j_godiscuss act">读者评价</span>
+									</h3>
+								</div>
+								<div class="userCommentWrap">
+									<div id="commentList">
+										<input type="hidden" id="commentpage" value="1"/>
+										<input type="hidden" id="needlines" value="3"/>
+										<div class="comment-list" id="comment-list">
+											<!--<dl>
+												<dd>
+													<div class="comment-info">
+														<h6>
+															<a class="zan">
+																<b>0</b>
+																<em class="iconfont">
+																	<i class="icon-thumbs-up"></i>
+																</em>
+															</a>
+															<a class="blue">傲世2015</a>
+															<i>评</i>
+															<span class="score-min star5"></span>
+														</h6>
+														<p class="normal">好评</p>
+														<p>2017-05-16 19:38</p>
+													</div>
+												</dd>
+												<dd>
+													<div class="comment-info">
+														<h6>
+															<a class="zan">
+																<b>0</b>
+																<em class="iconfont">
+																	<i class="icon-thumbs-up"></i>
+																</em>
+															</a>
+															<a class="blue">傲世2015</a>
+															<i>评</i>
+															<span class="score-min star4"></span>
+														</h6>
+														<p class="normal">好评</p>
+														<p>2017-05-16 19:38</p>
+													</div>
+												</dd>
+												<dd>
+													<div class="comment-info">
+														<h6>
+															<a class="zan">
+																<b>0</b>
+																<em class="iconfont">
+																	<i class="icon-thumbs-up"></i>
+																</em>
+															</a>
+															<a class="blue">傲世2015</a>
+															<i>评</i>
+															<span class="score-min star3"></span>
+														</h6>
+														<p class="normal">好评</p>
+														<p>2017-05-16 19:38</p>
+													</div>
+												</dd>
+												<dd>
+													<div class="comment-info">
+														<h6>
+															<a class="zan">
+																<b>0</b>
+																<em class="iconfont">
+																	<i class="icon-thumbs-up"></i>
+																</em>
+															</a>
+															<a class="blue">傲世2015</a>
+															<i>评</i>
+															<span class="score-min star2"></span>
+														</h6>
+														<p class="normal">好评</p>
+														<p>2017-05-16 19:38</p>
+													</div>
+												</dd>
+												<dd>
+													<div class="comment-info">
+														<h6>
+															<a class="zan">
+																<b>0</b>
+																<em class="iconfont">
+																	<i class="icon-thumbs-up"></i>
+																</em>
+															</a>
+															<a class="blue">傲世2015</a>
+															<i>评</i>
+															<span class="score-min star1"></span>
+														</h6>
+														<p class="normal">好评</p>
+														<p>2017-05-16 19:38</p>
+													</div>
+												</dd>
+											</dl>-->
+											<!--<div class="page-box cf">
+												<div class="pagination fr" id="page-container">
+													<div class="lbf-pagination">
+														<ul class="lbf-pagination-item-list" id="page-index">
+															<li class="lbf-pagination-item">
+																<a class="lbf-pagination-prev lbf-pagination-disabled"><</a>
+															</li>
+															<li class="lbf-pagination-item">
+																<a class="lbf-pagination-page  lbf-pagination-current">1</a>
+															</li>
+															<li class="lbf-pagination-item">
+																<a class="lbf-pagination-page">2</a>
+															</li>
+															<li class="lbf-pagination-item">
+																<span class="lbf-pagination-ellipsis">...</span>
+															</li>
+															<li class="lbf-pagination-item">
+																<a class="lbf-pagination-page">50</a>
+															</li>
+															<li class="lbf-pagination-item">
+																<a class="lbf-pagination-next">></a>
+															</li>
+														</ul>
+													</div>
+												</div>
+											</div>-->
+											<!--<div class="no-data">
+												<span></span>
+												<p>还没有评价<i>·</i>快来抢沙发
+												</p>
+											</div>-->
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="right-wrap fr">
+						<div class="other-rec-wrap">
+							<h3 class="lang">荐购图书列表</h3>
+							<ul  id="recommend_list_short">
+								<!--<li>
+									<div class=img-box>
+										<a href="">
+											<img src="img/150.jpg" />
+										</a>
+									</div>
+									<div class="book-info">
+										<h4>
+											<a href="">9/11委员会报告</a>
+										</h4>
+										<p class="author">
+											<img src="img/user.0.1.png" />
+											<a href="">刘梦翎</a>
+										</p>
+										<p class="intro">64%的用户读过</p>
+									</div>
+								</li>
+								<li>
+									<div class=img-box>
+										<a href="">
+											<img src="img/150.jpg" />
+										</a>
+									</div>
+									<div class="book-info">
+										<h4>
+											<a href="">9/11委员会报告</a>
+										</h4>
+										<p class="author">
+											<img src="img/user.0.1.png" />
+											<a href="">刘梦翎</a>
+										</p>
+										<p class="intro">64%的用户读过</p>
+									</div>
+								</li>
+								<li>
+									<div class=img-box>
+										<a href="">
+											<img src="img/150.jpg" />
+										</a>
+									</div>
+									<div class="book-info">
+										<h4>
+											<a href="">9/11委员会报告</a>
+										</h4>
+										<p class="author">
+											<img src="img/user.0.1.png" />
+											<a href="">刘梦翎</a>
+										</p>
+										<p class="intro">64%的用户读过</p>
+									</div>
+								</li>
+								<li>
+									<div class=img-box>
+										<a href="">
+											<img src="img/150.jpg" />
+										</a>
+									</div>
+									<div class="book-info">
+										<h4>
+											<a href="">9/11委员会报告</a>
+										</h4>
+										<p class="author">
+											<img src="img/user.0.1.png" />
+											<a href="">刘梦翎</a>
+										</p>
+										<p class="intro">64%的用户读过</p>
+									</div>
+								</li>
+								<li>
+									<div class=img-box>
+										<a href="">
+											<img src="img/150.jpg" />
+										</a>
+									</div>
+									<div class="book-info">
+										<h4>
+											<a href="">9/11委员会报告</a>
+										</h4>
+										<p class="author">
+											<img src="img/user.0.1.png" />
+											<a href="">刘梦翎</a>
+										</p>
+										<p class="intro">64%的用户读过</p>
+									</div>
+								</li>
+								<li>
+									<div class=img-box>
+										<a href="">
+											<img src="img/150.jpg" />
+										</a>
+									</div>
+									<div class="book-info">
+										<h4>
+											<a href="">9/11委员会报告</a>
+										</h4>
+										<p class="author">
+											<img src="img/user.0.1.png" />
+											<a href="">刘梦翎</a>
+										</p>
+										<p class="intro">64%的用户读过</p>
+									</div>
+								</li>-->
+							</ul>
+							<div>
+								<a href="recommend_dir.html" class="more_dir" target="_blank">查看更多目录</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="footer" id="footer">
+				<div class="box-center cf">
+					<div class="copy-right">
+						<p></p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="lbf-panel" style="display: none;">
+			<a class="lbf-panel-close lbf-icon lbf-icon-close" href="javascript:closecomment();">
+				<em class="iconfont" style="font-size: 18px;">
+					<i class="icon-remove"></i>
+				</em>
+			</a>
+			<div class="lbf-panel-body">
+				<div class="book-popup evaluate-popup">
+					<div class="popup-title">
+						<h3 class="lang">评价本书</h3>
+					</div>
+					<div class="eva-star-wrap">
+						<div class="eva-box">
+							<h4>给个评分</h4>
+							<div class="star-big">
+								<span id="starBig" style="cursor: pointer; width: 210px;">
+									<img src="img/star-off.png" alt="1"/>
+									<img src="img/star-off.png" alt="2"/>
+									<img src="img/star-off.png" alt="3"/>
+									<img src="img/star-off.png" alt="4"/>
+									<img src="img/star-off.png" alt="5"/>
+									<input type="hidden" name="score" />
+								</span>
+							</div>
+							<h4>简短评价</h4>
+							<div class="count-text">
+								<textarea class="gray" id="evaMsgText" style="color: rgb(102, 102, 102);"></textarea>
+							</div>
+						</div>
+						<div class="popup-btn">
+							<a class="red-btn" style="cursor: pointer;">保存</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="lbf-overlay" style="display: none;"></div>
+		<div class="mask" style="display: none;" id="login-mask">
+			<div class="qdlogin-wrap">
+				<div class="login-wrap f1">
+					<a class="close" id="close" href="javascript:closelogin();">
+						<em class="iconfont">
+							<i class="icon-remove"></i>
+						</em>
+					</a>
+					<div class="login-tab cf" id="j_loginTab">
+						<!--<ul>
+							<li class="lang stat act" tab="qidian">帐号登录</li>
+							<li class="lang stat" tab="qq">QQ登录</li>
+							<li class="lang stat" tab="weixin">微信登录</li>
+						</ul>-->
+						<p id="logintitle">帐号登录</p>
+					</div>
+					<div class="login-swich-wrap" id="j_loginSwitchWrap">
+						<div class="login-box">
+							<div class="normal-login" id="j_normalLogin">
+								<div class="error-tip hidden"></div>
+								<ul>
+									<li>
+										<em class="iconfont">
+											<p class="icon-user"></p>
+										</em>
+										<input type="text" tabindex="1" placeholder="帐号" id="username"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-key"></p>
+										</em>
+										<input type="password" tabindex="2" placeholder="密码" id="password"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-circle-blank"></p>
+										</em>
+										<input type="text" tabindex="3" placeholder="验证码" id="code" class="code"/>
+										<img id="codeimg" onclick="this.src='http://122.224.73.226:8081/auth/Verifycode?'+Math.random()"/>
+									</li>
+								</ul>
+								<a class="red-btn go-login btnlogin login-button" tabindex="4" id="loginbtn" onclick="javascript:login();">登录</a>
+							</div>
+							<div class="scan-login hidden" id="j_scanLogin">
+								<h3>手机扫码 安全登录</h3>
+								<p>使用 手机客户端 扫一扫登录</p>
+								<img src="http://122.224.73.226:8081/auth/Qrcode" />
+							</div>
+							<div class="regist-account hidden" id="j_regist" style="margin-top: -10px;">
+								<div class="error-tip hidden"></div>
+								<ul>
+									<li>
+										<em class="iconfont">
+											<p class="icon-mobile-phone"></p>
+										</em>
+										<input type="text" tabindex="1" placeholder="手机号，用于登录和找回密码" id="registmobile"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-user"></p>
+										</em>
+										<input type="text" tabindex="2" placeholder="昵称" id="name"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-key"></p>
+										</em>
+										<input type="password" tabindex="3" placeholder="密码" id="registpassword"/>
+									</li>
+									<li style="margin-bottom: 2px;">
+										<em class="iconfont">
+											<p class="icon-circle-blank"></p>
+										</em>
+										<input type="text" tabindex="4" placeholder="请输入短信验证码" id="registcode" class="code" style="width: 152px;"/>
+										<a onclick="javascript:getsmscode();" id="getsmscode">获取短信验证码</a>
+									</li>
+								</ul>
+								<div style="margin: 6px 0;">
+									<label style="padding-left: 70px;">
+									<input type="checkbox" class="isagree" checked="checked" id="isagree"/>阅读并接受
+									</label>
+									<a href="agreement.html" style="color: #1a4363;"  target="_blank">《用户协议》</a>
+									<!--<input type="checkbox" class="checkuser"/>阅读并接受《用户协议》-->
+								</div>
+								
+								<a class="red-btn go-login btnlogin login-button" tabindex="5" id="registbtn">注册</a>
+							</div>
+							<div class="other-login">
+								<a href="javascript:gotoscanlogin();" id="j_scanLoginBtn">扫码登录</a>
+								<a href="javascript:gotonormallogin();" id="j_normalLoginbtn1" style="display: none;">帐号登录</a>
+								<em>|</em>
+								<a href="javascript:gotoregist();" id="regist" class="stat">注册</a>
+								<a href="javascript:gotonormallogin();" id="j_normalLoginbtn" style="display: none;">帐号登录</a>
+							</div>
+							<div class="normal-login hidden" id="lib_ident_div">
+								<div>
+									<ul>
+										<li style="border: none; margin-bottom: 10px;">
+											<em class="iconfont" style="width: 84px;">
+												<p class="icon-user"></p>
+												<p style="display: inline;">账号：</p>
+											</em>
+											<input type="text" readonly="true" value="test" style="width: 232px;" id="getli_useraccount"/>
+										</li>
+										<li style="border: none; margin-bottom: 10px;">
+											<em class="iconfont" style="width: 84px;">
+												<p class="icon-user"></p>
+												<p style="display: inline;">姓名：</p>
+											</em>
+											<input type="text" readonly="true" value="test" style="width: 232px;" id="getli_username"/>
+										</li>
+										<div id="lib_ident">
+											<!--<li style="border: none; margin-bottom: 0px; width: 340px;">
+											<em class="iconfont" style="width: 84px;">
+												<p class="icon-user"></p>
+												<p style="display: inline;">身份：</p>
+											</em>
+											<input type="text" readonly="true" value="西南政法大学图书馆 S类读者 处于申请状态" style="width: 256px;" id="getli_libident" class="lib_input"/>
+										</li>
+										<li style="border: none; margin-bottom: 10px;">
+											<em class="iconfont" style="width: 84px;">
+											</em>
+											<input type="text" readonly="true" value="test" style="width: 232px;" id="getli_libident"/>
+										</li>-->
+										</div>
+									</ul>
+									<a class="red-btn go-login btnlogin login-button" style="font-size: 18px;" href="javascript:gotoliblist();">申请绑定身份</a>
+								</div>
+							</div>
+							<div class="normal-login hidden" id="lib_list">
+								<div>
+									<ul>
+										<li>
+											<em class="iconfont">
+												<p class="icon-building"></p>
+											</em>
+											<select id="libselect">
+											</select>
+										</li>
+										<li>
+											<em class="iconfont">
+												<p class="icon-user"></p>
+											</em>
+											<input type="text" value="" id="lib_username" placeholder="请输入图书馆内账号" tabindex="1"/>
+										</li>
+										<li>
+											<em class="iconfont">
+												<p class="icon-key"></p>
+											</em>
+											<input type="text" value="" id="lib_userpassword" placeholder="请输入图书馆内密码" tabindex="2"/>
+										</li>
+									</ul>
+									<a class="red-btn go-login btnlogin login-button" href="javascript:AppIdent();" style="margin-bottom: 10px;">提交</a>
+									<a class="red-btn go-login btnlogin login-button" href="javascript:gogetlib_account();">取消</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

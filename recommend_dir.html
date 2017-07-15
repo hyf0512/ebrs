@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css/booklist.css" />
+		<link rel="stylesheet" href="css/font-awesome-ie7.min.css" />
+		<link rel="stylesheet" href="css/font-awesome.min.css" />
+		<link rel="stylesheet" href="css/bookinfo.css" />
+		<script type="text/javascript" src="js/main.js" ></script>
+		<script type="text/javascript" src="js/jquery-min.js" ></script>
+		<script type="text/javascript" src="js/loginswich.js" ></script>
+		<script type="text/javascript" src="js/md5.js" ></script>
+		<title></title>
+	</head>
+	<script type="text/javascript">
+		function gotodirlist(rdId){
+			$("#rdId").val(rdId);
+			$("#form").submit();
+		}
+		function recommenddir(rdId){
+			var recomm_sessionId=document.cookie;
+			recomm_sessionId=recomm_sessionId.substring(14,recomm_sessionId.length);
+			if(recomm_sessionId==""||recomm_sessionId==null){
+				openlogin();
+			}
+			else{
+				$.ajax({
+				type:"post",
+				url:url+"/client/RecommendDir",
+				async:false,
+				data:"rdId="+rdId,
+				dataType:"jsonp",
+				success:function(data){
+					if(data.code=="0"){
+						console.log(data);
+						$("#"+rdId).css("color","#ed4259");
+						$("#"+rdId).removeAttr("href");
+						$("#"+rdId+" b").text(parseInt($("#"+rdId+" b").text())+1);
+					}
+					else{
+						alert("推荐失败");
+					}
+				}
+			});
+			}
+		}
+		function add0(m){return m<10?'0'+m:m }
+		function format(shijianchuo)
+		{
+			//shijianchuo是整数，否则要parseInt转换
+			var time = new Date(shijianchuo);
+			var y = time.getFullYear();
+			var m = time.getMonth()+1;
+			var d = time.getDate();
+			var h = time.getHours();
+			var mm = time.getMinutes();
+			var s = time.getSeconds();
+			return y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);
+		}
+		window.onload=function(){
+			document.title=web_title+"-荐购"
+			$(".copy-right p").text(footer);
+			$(".pin-logo p").text(web_title);
+			$.ajax({
+				type:"get",
+				url:url+"/client/GetRecommendDir",
+				async:false,
+				dataType:"jsonp",
+				success:function(data){
+					console.log(data);
+					if(data.code=="0"){
+						$("#resultcount").text(data.result.length);
+						var result=data.result;
+						var recommend_list="";
+						for(var i=0;i<result.length;i++){
+							recommend_list=recommend_list+'<dd>\
+								<div class="dir-img">\
+									<img src="img/150.jpg" />\
+								</div>\
+								<div class="recommendinfo">\
+									<h6>\
+										<a class="zan" id="'+result[i].rdId+'"';
+										if(result[i].status=="3"){
+											recommend_list=recommend_list+' style="color:#ed4259"';
+										}
+										else{
+											recommend_list=recommend_list+' href="javascript:recommenddir('+result[i].rdId+');"';
+										}
+										recommend_list=recommend_list+'>\
+											<b>'+result[i].count+'</b>\
+											<em class="iconfont">\
+												<i class="icon-thumbs-up"></i>\
+											</em>\
+										</a>\
+										<a class="blue" href="javascript:gotodirlist('+result[i].rdId+');">'+result[i].title+'</a>\
+									</h6>\
+									<p class="normal">'+result[i].rdIntroduce+'</p>\
+									<p>'+format(result[i].time)+'</p>\
+								</div>\
+							</dd>';
+						}
+						$(recommend_list).appendTo("#recommend_list");
+						if($(window).height()-40>$("body").height()){
+							$("#footer").css("bottom","0");
+						}
+					}
+				}
+			});
+		};
+	</script>
+	<body style="zoom: 1;">
+		<div class="wrap">
+			<div id="pin-nav" class="pin-nav-wrap need-search" data-l1="40" style="margin-bottom: 16px;">
+    			<div class="box-center cf">
+        			<div class="nav-list site-nav fl">
+            			<ul>
+                			<li class="site"><a class="pin-logo" data-eid="qd_A43" href="search.html"><p></p></a>
+                			</li>  
+            			</ul>
+        			</div>
+        			<div class="nav-list min-user fr">
+           				 <ul>
+                			<li class="line"></li>
+               				 <!-- 未登录 -->
+               				<li class="sign-out">
+                    			<a id="pin-login" href="javascript:openlogin();" data-eid="qd_A64">登录</a>
+               			 	</li>
+               				 <!-- 登录后 -->
+                			<li class="sign-in hidden">
+                    		<a href="" target="_blank" data-eid="qd_A65">
+                    			<i id="nav-user-name"></i>
+                    			<i id="nav-user-id" style="display: none;"></i>
+                    			<span></span>
+                    		</a>
+                    		<div class="dropdown">
+                    			<a href="javascript:gogetlib_account();">绑定身份</a>
+                    			<a href="javascript:logout();">退出</a>
+                    		</div>
+                			</li>
+                			<li class="line"></li>
+            			</ul>
+        			</div>
+    			</div>
+			</div>
+			<form id="form" action="recommend_booklist.html">
+				<input type="text" name="rdId" value="" id="rdId" style="display: none;"/>
+				<input type="text" name="page" value="1" id="page" style="display: none;"/>
+				<input type="text" name="needlines" value="10" id="needlines" style="display: none;"/>
+			</form>
+		<div class="result-wrap box-center cf">
+				<div class="main-content-wrap f1">
+					<div class="tool-bar cf" data-ll="6">
+						<div class="count-info fr">
+							<p>共<span id="resultcount"></span>条结果</p>
+						</div>
+					</div>
+					<div id="result-list" data-ll="3">
+					<div class="book-img-text">
+						<!--<ul id="book" name="book">
+							<li data-rid="1">
+								<div class="book-img-box">
+									<a>
+										<img src="img/150.jpg"/>
+									</a>
+								</div>
+								<div class="book-mid-info">
+									<h4>
+										<a href="#">穿越之烟霭纷纷
+											<span title="可阅读链接数">
+												<i class="icon-book">
+													<span class="count">11</span>
+												</i>
+											</span>
+										</a>
+									</h4>
+									<p class="author">
+										<span>作者：徐杰,赵景文著</span>
+									</p>
+									<p class="intro">货币史 本书主要内容包括：第一次货币——为什么说欧洲崛起于中国古代纸币的崩溃？第二次货币战争——欧洲争霸中黄金的力量；第三次货币战争——成为日不落帝国的秘密是什么等。</p>
+									<p class="update">
+										<span>
+											<i class="icon-tag">ISBN:[9787564209919]</i>
+										</span>
+										<span>
+											<i class="icon-home">上海财经大学出版社</i>
+										</span>
+										<span>
+											<i class="icon-time">出版日期:2011</i>
+										</span>
+									</p>
+								</div>
+								<div class="book-right-info">
+									<div class="total">
+										<p>
+											<i class="icon-fire"></i>
+											点击量：<span>58</span>
+										</p>
+										<p>
+											<i class="icon-group"></i>
+											阅读量：<span>58</span>
+										</p>
+										<p>
+											<i class="icon-comment"></i>
+											评论条数：<span>58</span>
+										</p>
+									</div>
+									<p class="btn">
+										<a class="red-btn" href="">书籍详情</a>
+									</p>
+								</div>
+							</li>
+						</ul>-->
+						<dl id="recommend_list">
+							<!--<dd>
+								<div class="dir-img">
+									<img src="img/150.jpg" />
+								</div>
+								<div class="recommendinfo">
+									<h6>
+										<a class="zan">
+											<b>1</b>
+											<em class="iconfont">
+												<i class="icon-thumbs-up"></i>
+											</em>
+										</a>
+										<a class="blue">历史上</a>
+									</h6>
+									<p class="normal">
+										除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好除了更新慢，一切都好
+									</p>
+									<p>2017-05-20 21:02</p>
+								</div>
+							</dd>-->
+						</dl>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="footer" id="footer">
+			<div class="box-center cf">
+				<div class="copy-right">
+					<p></p>
+				</div>
+			</div>
+		</div>
+	</div>
+		<div class="mask" style="display: none;" id="login-mask">
+			<div class="qdlogin-wrap">
+				<div class="login-wrap f1">
+					<a class="close" id="close" href="javascript:closelogin();">
+						<em class="iconfont">
+							<i class="icon-remove"></i>
+						</em>
+					</a>
+					<div class="login-tab cf" id="j_loginTab">
+						<!--<ul>
+							<li class="lang stat act" tab="qidian">帐号登录</li>
+							<li class="lang stat" tab="qq">QQ登录</li>
+							<li class="lang stat" tab="weixin">微信登录</li>
+						</ul>-->
+						<p id="logintitle">帐号登录</p>
+					</div>
+					<div class="login-swich-wrap" id="j_loginSwitchWrap">
+						<div class="login-box">
+							<div class="normal-login" id="j_normalLogin">
+								<div class="error-tip hidden"></div>
+								<ul>
+									<li>
+										<em class="iconfont">
+											<p class="icon-user"></p>
+										</em>
+										<input type="text" tabindex="1" placeholder="帐号" id="username"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-key"></p>
+										</em>
+										<input type="password" tabindex="2" placeholder="密码" id="password"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-circle-blank"></p>
+										</em>
+										<input type="text" tabindex="3" placeholder="验证码" id="code" class="code"/>
+										<img id="codeimg" onclick="this.src='http://122.224.73.226:8081/auth/Verifycode?'+Math.random()"/>
+									</li>
+								</ul>
+								<a class="red-btn go-login btnlogin login-button" tabindex="4" id="loginbtn" onclick="javascript:login();">登录</a>
+							</div>
+							<div class="scan-login hidden" id="j_scanLogin">
+								<h3>手机扫码 安全登录</h3>
+								<p>使用 手机客户端 扫一扫登录</p>
+								<img src="http://122.224.73.226:8081/auth/Qrcode" />
+							</div>
+							<div class="regist-account hidden" id="j_regist" style="margin-top: -10px;">
+								<div class="error-tip hidden"></div>
+								<ul>
+									<li>
+										<em class="iconfont">
+											<p class="icon-mobile-phone"></p>
+										</em>
+										<input type="text" tabindex="1" placeholder="手机号，用于登录和找回密码" id="registmobile"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-user"></p>
+										</em>
+										<input type="text" tabindex="2" placeholder="昵称" id="name"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-key"></p>
+										</em>
+										<input type="password" tabindex="3" placeholder="密码" id="registpassword"/>
+									</li>
+									<li style="margin-bottom: 2px;">
+										<em class="iconfont">
+											<p class="icon-circle-blank"></p>
+										</em>
+										<input type="text" tabindex="4" placeholder="请输入短信验证码" id="registcode" class="code" style="width: 152px;"/>
+										<a onclick="javascript:getsmscode();" id="getsmscode">获取短信验证码</a>
+									</li>
+								</ul>
+								<div style="margin: 6px 0;">
+									<label style="padding-left: 70px;">
+									<input type="checkbox" class="isagree" checked="checked" id="isagree"/>阅读并接受
+									</label>
+									<a href="agreement.html" style="color: #1a4363;"  target="_blank">《用户协议》</a>
+									<!--<input type="checkbox" class="checkuser"/>阅读并接受《用户协议》-->
+								</div>
+								
+								<a class="red-btn go-login btnlogin login-button" tabindex="5" id="registbtn">注册</a>
+							</div>
+							<div class="other-login">
+								<a href="javascript:gotoscanlogin();" id="j_scanLoginBtn">扫码登录</a>
+								<a href="javascript:gotonormallogin();" id="j_normalLoginbtn1" style="display: none;">帐号登录</a>
+								<em>|</em>
+								<a href="javascript:gotoregist();" id="regist" class="stat">注册</a>
+								<a href="javascript:gotonormallogin();" id="j_normalLoginbtn" style="display: none;">帐号登录</a>
+							</div>
+							<div class="normal-login hidden" id="lib_ident_div">
+								<div>
+									<ul>
+										<li style="border: none; margin-bottom: 10px;">
+											<em class="iconfont" style="width: 84px;">
+												<p class="icon-user"></p>
+												<p style="display: inline;">账号：</p>
+											</em>
+											<input type="text" readonly="true" value="test" style="width: 232px;" id="getli_useraccount"/>
+										</li>
+										<li style="border: none; margin-bottom: 10px;">
+											<em class="iconfont" style="width: 84px;">
+												<p class="icon-user"></p>
+												<p style="display: inline;">姓名：</p>
+											</em>
+											<input type="text" readonly="true" value="test" style="width: 232px;" id="getli_username"/>
+										</li>
+										<div id="lib_ident">
+											<!--<li style="border: none; margin-bottom: 0px; width: 340px;">
+											<em class="iconfont" style="width: 84px;">
+												<p class="icon-user"></p>
+												<p style="display: inline;">身份：</p>
+											</em>
+											<input type="text" readonly="true" value="西南政法大学图书馆 S类读者 处于申请状态" style="width: 256px;" id="getli_libident" class="lib_input"/>
+										</li>
+										<li style="border: none; margin-bottom: 10px;">
+											<em class="iconfont" style="width: 84px;">
+											</em>
+											<input type="text" readonly="true" value="test" style="width: 232px;" id="getli_libident"/>
+										</li>-->
+										</div>
+									</ul>
+									<a class="red-btn go-login btnlogin login-button" style="font-size: 18px;" href="javascript:gotoliblist();">申请绑定身份</a>
+								</div>
+							</div>
+							<div class="normal-login hidden" id="lib_list">
+								<div>
+									<ul>
+										<li>
+											<em class="iconfont">
+												<p class="icon-building"></p>
+											</em>
+											<select id="libselect">
+											</select>
+										</li>
+										<li>
+											<em class="iconfont">
+												<p class="icon-user"></p>
+											</em>
+											<input type="text" value="" id="lib_username" placeholder="请输入图书馆内账号" tabindex="1"/>
+										</li>
+										<li>
+											<em class="iconfont">
+												<p class="icon-key"></p>
+											</em>
+											<input type="text" value="" id="lib_userpassword" placeholder="请输入图书馆内密码" tabindex="2"/>
+										</li>
+									</ul>
+									<a class="red-btn go-login btnlogin login-button" href="javascript:AppIdent();" style="margin-bottom: 10px;">提交</a>
+									<a class="red-btn go-login btnlogin login-button" href="javascript:gogetlib_account();">取消</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

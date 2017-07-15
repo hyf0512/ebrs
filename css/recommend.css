@@ -1,0 +1,62 @@
+.main-content-wrap .book-img-text dd{
+	overflow: hidden;
+    padding: 18px 0;
+    border-bottom: 1px solid #e6e6e6;
+}
+.main-content-wrap .book-img-text dd .recommendinfo{
+	float: left;
+    width: 876px;
+}
+@media (max-width: 1200px){
+	
+	.main-content-wrap .book-img-text dd .recommendinfo{
+    width: 666px;
+	}
+}
+.main-content-wrap .book-img-text dd .recommendinfo h6{
+	font: 18px/24px PingFangSC-Regular,'-apple-system',Simsun;
+    overflow: hidden;
+    max-height: 30px;
+    margin-bottom: 7px;
+    color: #999;
+    font-weight: 600;
+}
+.main-content-wrap .book-img-text dd .recommendinfo h6 .zan{
+	float: right;
+    color: #a6a6a6;
+}
+.main-content-wrap .book-img-text dd .recommendinfo h6 .blue{
+	margin-right: 5px;
+}
+.dir-img{
+	position: relative;
+    z-index: 1;
+    width: 66px;
+    height: 66px;
+    margin: 8px 8px 0 10px;
+}
+.main-content-wrap .book-img-text dd .dir-img{
+	float: left;
+    margin: 0 12px 0 0;
+}
+.dir-img img{
+	    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+}
+.main-content-wrap .book-img-text dd .recommendinfo p{
+	font: 14px/24px PingFangSC-Regular,'-apple-system',Simsun;
+    overflow: hidden;
+    max-width: 660px;
+    margin-bottom: 10px;
+    transition: height .3s;
+}
+.main-content-wrap .book-img-text dd .recommendinfo p.normal{
+	    max-height: 72px;
+}
+.main-content-wrap .book-img-text dd .recommendinfo p+p{
+	    font: 12px/14px PingFangSC-Regular,'-apple-system',Simsun;
+    margin-bottom: 0;
+    color: #999;
+}

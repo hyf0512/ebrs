@@ -1,0 +1,497 @@
+html{
+}
+.content{
+	background: #fff;
+	padding-bottom: 30px;
+}
+.banner {
+	position:absolute;
+	z-index:100;
+	top:0px;
+	left:0px;
+    width:100%;
+    margin:auto;
+    float:none;
+	background:#fff;
+	border-bottom: 1px solid #ddd;
+}
+
+.LogoTitle {
+    font-size:36px;
+    text-align: center;
+    height:110px;
+	line-height:110px;
+    overflow:hidden;
+	white-space:nowrap;
+	vertical-align:middle;
+	color: #666;
+}
+.banner img{
+	height: 100px;
+	vertical-align:middle;
+	position:absolute;
+	top: 0px;
+	left: 0px;
+}
+.bannerMini{
+	position:fixed;
+	background: #fafafa;
+
+	-webkit-box-shadow:0 0 3px rgba(100, 100, 100, 1);
+	-moz-box-shadow:0 0 3px rgba(100, 100, 100, 1);
+	box-shadow:0 0 3px rgba(100, 100, 100, 1);
+	
+	-ms-filter:"progid:DXImageTransform.Microsoft.Shadow(Strength=3,Direction=135, Color='#646464')";
+	filter:	progid:DXImageTransform.Microsoft.Shadow(Strength=3,Direction=135,Color='#646464');
+}
+
+.bannerMini .LogoTitle{
+    height:40px !important;
+	line-height:40px !important;
+	font-size: 20px;
+}
+
+.bannerMini img{
+	height: 40px !important;
+}
+
+.footer{
+	margin-top:50px;text-align:center;font-size:12px;line-height:80px; height: 80px; background:#333;color:#fff;
+	position:fixed;
+	z-index: -1;
+	left:0px;
+	bottom:0px;
+	width:100%;
+}
+
+.banner .session {
+	position: absolute;
+	top: 7px;
+	right: 6px;
+	font-size: 16px;
+	cursor: pointer;
+}
+.banner .session i {
+	font-size: 20px;
+	margin-right: 6px;
+}
+.banner .session .logined i{
+	color: #369;
+}
+.banner .session .nosession{
+	color: #aaa;
+}
+.result{
+	width: 95%;
+	margin:auto;
+}
+
+.result th{
+	text-align: center;
+	padding:6px;
+	border: 0px;
+	vertical-align:top;
+}
+.result td{
+	padding:6px;
+	border: 0px;
+	vertical-align:top;
+	text-align: left;
+}
+/*检索匹配到关键字*/
+.result em{
+	font-weight:600;
+	color: red;
+}
+/*检索匹配到同音字*/
+.result b{
+	font-weight:600;
+	color: red;
+}
+.result .item{
+}
+.result .item th{
+	width:75px;
+}
+.result .item img{
+	width:70px;
+	height:80px;
+	cursor:pointer;
+}
+.result .title{
+	color:#11f;
+}
+.result .titleText{
+	border-bottom: 1px solid #11f;
+	cursor:pointer;
+	font-size:16px;
+	font-weight:600;
+}
+.result .author{
+	color:#999;
+}
+
+.count{
+	font-size: 9px;
+	color: #666;
+	padding:2px;
+}
+button .count{
+	color: #fff;
+}
+.countHeat{
+	float:right;
+	color: #191;
+	margin:0px 6px 0px 6px;
+}
+.countReadNumber{
+	float:right;
+	color: #191;
+	margin:0px 6px 0px 6px;
+}
+.countComments{
+	float:right;
+	color: #191;
+	margin:0px 6px 0px 6px;
+}
+
+.result .summary{
+	margin:6px 0px 3px 2px;
+}
+
+.result .press{
+	font-size: 12px;
+	margin:2px;
+	color:#999;
+}
+
+.result .press span{
+	margin-right:10px;
+}
+
+.result .icon-book{
+	color: #46a;
+}
+.result .icon-tag{
+	color: #777;
+}
+.result .icon-home{
+	color: #555;
+}
+.result .icon-time{
+	color: #555;
+}
+.result .split{
+	height:30px;
+	background: url(../img/split.png) repeat-x center;
+}
+.result .totalCount {
+	color: #999;
+	text-align:left;
+	padding-bottom: 2px;
+	background: url(../img/split.png) repeat-x center bottom;
+}
+.searchBarSpace{
+	height:100px;
+	font-size: 30px;
+	color: #999;
+}
+
+.noData{
+	font-size: 16px;
+	margin: 40px;
+}
+
+.pageline{
+	float: none;
+	text-align:center;
+	width:auto;
+	margin:auto;
+}
+.page{
+	text-align:center;
+	vertical-align: middle;
+	display:inline-block;
+	min-width: 20px;
+	height: 20px;
+	line-height: 20px;
+	padding:6px;
+	margin: 6px;
+	background: #eee;
+	cursor: pointer;
+	color: #369;
+
+	font-weight: 600;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+.pageline .pageBegin{
+	border: 0px;
+	background: #fff;
+	font-size: 20px;
+}
+.pageline .pageEnd{
+	border: 0px;
+	background: #fff;
+	font-size: 20px;
+}
+.pageline .current{
+	border:1px solid #999;
+	background: #fff;
+	color: #666;
+	cursor: default;
+}
+.result tr{
+}
+
+.searchBar{
+	text-align:left;width:605px;margin:auto;
+	margin-top:10px;
+	margin-bottom:2px;
+}
+.searchBar>table{
+	text-align:center;
+}
+.searchBar .keyword{
+	width:500px;height:30px;border-left:1px solid #48f;border-top:1px solid #48f;border-bottom:1px solid #48f;padding:3px;
+}
+.searchBar .keyword input{
+	width:100%;height:100%;border:0px; padding:0px; margin:0px;
+}
+.searchBar #advBtn{
+	background:#f5f5f5;width:30px;height:30px;border-top:1px solid #48f;border-bottom:1px solid #48f;cursor:pointer;
+}
+.searchBar #searchBtn{
+	border: 1px solid #48f;width:70px;height:30px;background: #48f;color: #fff;cursor:pointer;
+}
+.searchBar #advPanel{
+	position:absolute;
+	display:none;border: 1px solid #aaa; border-top:0px;width:530px !important;width:532px;
+	background:#fff;
+	
+	-webkit-box-shadow:0 0 3px rgba(100, 100, 100, 1);
+	-moz-box-shadow:0 0 3px rgba(100, 100, 100, 1);
+	box-shadow:0 0 3px rgba(100, 100, 100, 1);
+}
+
+.searchCond{
+	margin:auto;
+	margin-top: 5px;
+	margin-bottom: 10px;
+	color: #555;
+}
+.searchCond td{
+	padding:2px;
+}
+.item{
+	padding: 6px;
+}
+
+.readBook{
+}
+.recommendBook{
+}
+
+.retBack{
+	position:absolute;
+	margin-top:10px;
+	left: 10px;
+	font-size: 30px;
+	color: #369;
+	cursor: pointer;
+}
+
+.infoTitle{
+	height:50px;line-height: 50px; background: #eee;color:#000; text-align:center; font-size:20px;vertical-align: middle;
+}
+
+.noBookImage{
+	margin:auto;
+	background: #feb;
+	width: 160px;
+	height: 220px;
+	overflow: hidden;
+	border:6px solid #999;
+	border-top:3px solid #aaa;
+	border-bottom:3px solid #aaa;
+	border-right:3px solid #aaa;
+	
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	
+	-webkit-box-shadow: 6px 6px 12px #999;
+	-moz-box-shadow: 6px 6px 12px #999;
+	box-shadow: 6px 6px 12px #999;
+}
+
+.noBookImage .title{
+	display:block;
+	margin: 10px;
+	margin-top:30px;
+	font-size: 18px;
+}
+.noBookImage .author{
+	display:block;
+	margin-top:40px;
+	font-size: 12px;
+	color: #666;
+}
+
+.imgPath{
+	width:160px;
+	text-align:center;
+	vertical-align:top;
+	padding:5px;
+}
+.imgPath img{
+	width:150px;
+}
+.field{
+	width: 100px;
+	text-align:right;
+	color:#999;
+}
+.fieldtext{
+	text-align:left;
+	height: 25px;
+}
+.fulldata{
+	text-align:center;
+	padding:6px;
+}
+button{
+	border: 1px solid #369;
+	background: #369;
+	color: #fff;
+	font-size:16px;
+	padding: 4px 8px 4px 8px;
+	margin:3px;
+	cursor:pointer;
+	
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	
+	-webkit-box-shadow: 0px 0px 11px #eee;
+	-moz-box-shadow: 0px 0px 11px #eee;
+	box-shadow: 0px 0px 11px #eee;
+}
+
+button.linkBook{
+	border: 1px solid #396;
+	background: #396;
+}
+.linkBook img{
+	width: 20px;
+}
+button.recommended {
+	background: #69c;
+	border: 1px solid #69c;
+	cursor: default;
+}
+
+button .btnbookType{
+	font-size:12px;
+	color: yellow;
+}
+button.disabled {
+	border: 1px solid #ccc;
+	background: #ccc;
+	color: #333;
+    cursor: default;
+}
+
+.comments {
+	text-align:left;
+}
+.commentsTitle{
+	margin-top: 20px;
+	border-top: 1px dashed #171;
+	color:#171;
+	font-weight: 600;
+}
+
+.comment {
+	text-indent: 20px;
+	border-bottom:1px dashed #ddd;
+	padding: 20px;
+}
+.comment .user{
+	color:#666;
+}
+.noComment {
+	text-indent: 20px;
+	color:#999;
+	padding: 20px;
+}
+
+.tbBookInfo {
+	margin:auto;
+	text-align: center;
+	width:100%;
+}
+
+.tbUserInfo{
+	margin:auto;
+	text-align: center;
+	margin-top: 20px;
+	width:50%;
+	height: 300px;
+}
+.userIconImg{
+	width: 80px;
+	font-size: 80px;
+	text-align: right;
+	vertical-align: top;
+}
+.lnk{
+	cursor:pointer;
+	border-bottom: 1px solid #999;
+}
+
+.searchWord{
+	color: #999;
+}
+.searchWord span{
+	margin:0px 3px 0px 3px;
+	border: 1px solid #aaa;
+	padding: 1px 6px 1px 6px;
+
+	border-radius: 20px;
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+}
+
+.hasImgPath{
+	background: none !important;
+}
+.hasImgPath img{
+	height: auto !important;
+}
+.dlgTitle{
+	font-size: 18px;
+}
+
+#waitDialog{position:absolute;width: 150px;line-height:80px;height:80px;margin-left:-75px;margin-top:-40px;left:50%;top:50%;border:2px solid #666;background:#FFC;font-size:14px;overflow:hidden; vertical-align:middle;z-index:10000;}
+#waitDialog img{ height:30px;vertical-align:middle;}
+#waitDialog span{ height:30px;vertical-align:middle;}
+
+
+.ident{
+	padding: 3px;
+	border-bottom: 1px solid #bbb;
+}
+.ident .identMemo{
+	color: #888;
+}
+.icon-retweet{
+	color: #369;
+}
+.icon-ok-sign{
+	color: #396;
+}
+.icon-exclamation-sign{
+	color: #F36;
+}

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="css/font-awesome-ie7.min.css" />
+		<link rel="stylesheet" href="css/font-awesome.min.css" />
+		<link rel="stylesheet" href="css/booklist.css" />
+		<link rel="stylesheet" href="css/main.css" />
+		<link rel="stylesheet" href="css/bookinfo.css" />
+		<script type="text/javascript" src="js/main.js" ></script>
+		<script type="text/javascript" src="js/jquery-min.js" ></script>
+		<script type="text/javascript" src="js/loginswich.js" ></script>
+		<script type="text/javascript" src="js/md5.js" ></script>
+		<title></title>
+	</head>
+	<script type="text/javascript">
+		function more(){
+			if($("#sc_adv").css("display")=="none"){
+				$("#sc_adv").css("display","block");
+			}
+			else{
+				$("#sc_adv").css("display","none");
+			}
+		}
+		function search(){
+			$("#page").val("1");
+			$.ajax({
+   				 type: 'post',
+    			url: url+'/opac/search',
+    			data: $("#form").serialize(),
+    			success: function(data) {
+    				$("#logo").css("margin-left","-180px");
+    				$("#lg").css("width","29%");
+    				$("#form").css("top","-71px");
+    				$("#m").css("top","16.2%");
+    				$("#line").css("display","block");
+    				}
+				});
+		}
+		$(function(){
+			document.title=web_title+"－检索";
+			get_tag_list();
+			$(".footer").text(footer);
+			$(".pin-logo p").text(web_title);
+			$("#havSrcDatabox").change(function(){
+				if(document.getElementById("havSrcDatabox").checked){
+					$("#havSrcData").val("checked");
+				}
+				else{
+					$("#havSrcData").val("");
+				}
+			});
+			
+		})
+			
+	</script>
+	<body style="height: 96%;">
+		<!--<div class="banner">
+			<a href="search.html"><img src="img/logo.png"/></a>
+			<div class="LogoTitle">EBR电子图书典藏系统</div>
+			<div class="session">
+        <span class="logined"><i class="icon-user"></i>${session.userName!}</span>
+        <span class="nosession"><i class="icon-signin"></i>未登录</span>
+</div>
+		</div>-->
+		<div class="wrapper">
+			<div id="pin-nav" class="pin-nav-wrap need-search" data-l1="40" style="margin-bottom: 16px;">
+    			<div class="box-center cf">
+        			<div class="nav-list site-nav fl">
+            			<ul>
+                			<li class="site"><a class="pin-logo" data-eid="qd_A43" href="search.html"><p></p></a>
+                			</li>  
+            			</ul>
+        			</div>
+        			<div class="nav-list min-user fr">
+           				 <ul>
+                			<li class="line"></li>
+               				 <!-- 未登录 -->
+               				<li class="sign-out">
+                    			<a id="pin-login" href="javascript:openlogin();" data-eid="qd_A64">登录</a>
+               			 	</li>
+               				 <!-- 登录后 -->
+                			<li class="sign-in hidden">
+                    		<a href="" target="_blank" data-eid="qd_A65">
+                    			<i id="nav-user-name"></i>
+                    			<i id="nav-user-id" style="display: none;"></i>
+                    			<span></span>
+                    		</a>
+                    		<div class="dropdown">
+                    			<a href="javascript:gogetlib_account();">绑定身份</a>
+                    			<a href="javascript:logout();">退出</a>
+                    		</div>
+                			</li>
+                			<li class="line"></li>
+            			</ul>
+        			</div>
+    			</div>
+			</div>
+			
+			<div id="line" class="u" style="z-index:1;width: 100%; border-bottom: 1px solid #ddd; top: 11%;display: none;"></div>
+			<div id="content">
+				<div class="content_wr">
+					<div id="m">
+						<div id="lg">
+							<img src="img/logo.png" style="width: 270px;height: 150px;" id="logo"/>
+						</div>
+						<form name="f" id="form" action="booklist.html">
+							<input type="hidden" name="page" value="1"/>
+							<input type="hidden" name="mode" value="jsonlist"/>
+							<input type="hidden" name="needlines" value="10"/>
+							<input type="hidden" name="vid" value=""/>
+							<input type="hidden" name="havSrcData" id="havSrcData" value=""/>
+						<div id="fm">
+							<table >
+								<span class="s_ipt_wr">
+									<input type="text" name="keyword" id="keyword" maxlength="256" class="s_ipt" autocomplete="off">
+								</span>
+								<span class="s_btn_wr">
+									<input type="submit" id="su" value="搜索" class="s_btn">
+								</span>
+							</table>
+							<div class="sc_adv_triangle_down" onclick="javascript:more();">
+								<span>
+									<i class="icon-reorder"></i>
+								</span>
+							</div>
+							<div id="sc_adv" style="display: none;">
+								<table id="sc_adv_frm">
+									<div class="sc_adv_hatr">
+										<span class="sc_adv_label">作者</span>
+										<span>
+											<input style="width: 160px" name="author" placeholder="请输入作者姓名" data-type="precise" data-name="" class="sc_adv_keyword_ipt sc-input sc_adv_keyword2" maxlength="100" value="">
+										</span>
+									</div>
+									<div class="sc_adv_hatr">
+										<span class="sc_adv_label">出版社</span>
+										<span><input style="width: 160px" type="text" name="press" placeholder="请输入出版社名称" data-type="or" data-name="" class="sc_adv_keyword_ipt sc-input" maxlength="100" value=""></span></div>
+									<div class="sc_adv_hatr">
+										<span class="sc_adv_label">出版日期范围</span>
+										<span><input type="text" name="dateStart" placeholder="开始时间" data-type="not" data-name="" class="sc_adv_keyword_ipt sc-input" maxlength="100" value="" style="width: 59px;"></span>
+										<span class="sc_adv_label" style="width: 8px;padding-left: 8px;">至</span>
+										<span><input type="text" placeholder="结束时间" name="dateEnd" data-type="not" data-name="" class="sc_adv_keyword_ipt sc-input" maxlength="100" value="" style="width: 59px;"></span>
+									</div>
+									<div class="sc_adv_hatr">
+										<span class="sc_adv_label">是否有全文数据</span>
+										<span><input type="checkbox"  id="havSrcDatabox" name="havSrcDatabox" data-type="not" data-name="" class="sc_adv_keyword_ipt sc-input checkbox" style="width: 20px;"></span></div>
+									<div class="sc_adv_tag">
+										<span class="sc_adv_label">标签</span>
+										<span class="list"></span>
+										</div>
+									<span class="sc_adv_sub s_btn_wr"><input type="submit" value="搜索" class="sc_adv_sub_btn s_btn"></span>
+									</div>
+									</table>
+						</div>
+					</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="footer">
+			<!--ERCMS V1.0.16.1221 build 10，Copyright © 2016 杭州紫恒科技有限公司-->
+		</div>
+		</div>
+		<div class="mask" style="display: none;" id="login-mask">
+			<div class="qdlogin-wrap">
+				<div class="login-wrap f1">
+					<a class="close" id="close" href="javascript:closelogin();">
+						<em class="iconfont">
+							<i class="icon-remove"></i>
+						</em>
+					</a>
+					<div class="login-tab cf" id="j_loginTab">
+						<!--<ul>
+							<li class="lang stat act" tab="qidian">帐号登录</li>
+							<li class="lang stat" tab="qq">QQ登录</li>
+							<li class="lang stat" tab="weixin">微信登录</li>
+						</ul>-->
+						<p id="logintitle">帐号登录</p>
+					</div>
+					<div class="login-swich-wrap" id="j_loginSwitchWrap">
+						<div class="login-box">
+							<div class="normal-login" id="j_normalLogin">
+								<div class="error-tip hidden"></div>
+								<ul>
+									<li>
+										<em class="iconfont">
+											<p class="icon-user"></p>
+										</em>
+										<input type="text" tabindex="1" placeholder="帐号" id="username"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-key"></p>
+										</em>
+										<input type="password" tabindex="2" placeholder="密码" id="password"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-circle-blank"></p>
+										</em>
+										<input type="text" tabindex="3" placeholder="验证码" id="code" class="code"/>
+										<img id="codeimg" onclick="this.src='http://122.224.73.226:8081/auth/Verifycode?'+Math.random()"/>
+									</li>
+								</ul>
+								<a class="red-btn go-login btnlogin login-button" tabindex="4" id="loginbtn" onclick="javascript:login();">登录</a>
+							</div>
+							<div class="scan-login hidden" id="j_scanLogin">
+								<h3>手机扫码 安全登录</h3>
+								<p>使用 手机客户端 扫一扫登录</p>
+								<img src="http://122.224.73.226:8081/auth/Qrcode" />
+							</div>
+							<div class="regist-account hidden" id="j_regist" style="margin-top: -10px;">
+								<div class="error-tip hidden"></div>
+								<ul>
+									<li>
+										<em class="iconfont">
+											<p class="icon-mobile-phone"></p>
+										</em>
+										<input type="text" tabindex="1" placeholder="手机号，用于登录和找回密码" id="registmobile"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-user"></p>
+										</em>
+										<input type="text" tabindex="2" placeholder="昵称" id="name"/>
+									</li>
+									<li>
+										<em class="iconfont">
+											<p class="icon-key"></p>
+										</em>
+										<input type="password" tabindex="3" placeholder="密码" id="registpassword"/>
+									</li>
+									<li style="margin-bottom: 2px;">
+										<em class="iconfont">
+											<p class="icon-circle-blank"></p>
+										</em>
+										<input type="text" tabindex="4" placeholder="请输入短信验证码" id="registcode" class="code" style="width: 152px;"/>
+										<a onclick="javascript:getsmscode();" id="getsmscode">获取短信验证码</a>
+									</li>
+								</ul>
+								<div style="margin: 6px 0;">
+									<label style="padding-left: 70px;">
+									<input type="checkbox" class="isagree" checked="checked" id="isagree"/>阅读并接受
+									</label>
+									<a href="agreement.html" style="color: #1a4363;"  target="_blank">《用户协议》</a>
+									<!--<input type="checkbox" class="checkuser"/>阅读并接受《用户协议》-->
+								</div>
+								
+								<a class="red-btn go-login btnlogin login-button" tabindex="5" id="registbtn">注册</a>
+							</div>
+							<div class="other-login">
+								<a href="javascript:gotoscanlogin();" id="j_scanLoginBtn">扫码登录</a>
+								<a href="javascript:gotonormallogin();" id="j_normalLoginbtn1" style="display: none;">帐号登录</a>
+								<em>|</em>
+								<a href="javascript:gotoregist();" id="regist" class="stat">注册</a>
+								<a href="javascript:gotonormallogin();" id="j_normalLoginbtn" style="display: none;">帐号登录</a>
+							</div>
+							<div class="normal-login hidden" id="lib_ident_div">
+								<div>
+									<ul>
+										<li style="border: none; margin-bottom: 10px;">
+											<em class="iconfont" style="width: 84px;">
+												<p class="icon-user"></p>
+												<p style="display: inline;">账号：</p>
+											</em>
+											<input type="text" readonly="true" value="test" style="width: 232px;" id="getli_useraccount"/>
+										</li>
+										<li style="border: none; margin-bottom: 10px;">
+											<em class="iconfont" style="width: 84px;">
+												<p class="icon-user"></p>
+												<p style="display: inline;">姓名：</p>
+											</em>
+											<input type="text" readonly="true" value="test" style="width: 232px;" id="getli_username"/>
+										</li>
+										<div id="lib_ident">
+											<!--<li style="border: none; margin-bottom: 0px; width: 340px;">
+											<em class="iconfont" style="width: 84px;">
+												<p class="icon-user"></p>
+												<p style="display: inline;">身份：</p>
+											</em>
+											<input type="text" readonly="true" value="西南政法大学图书馆 S类读者 处于申请状态" style="width: 256px;" id="getli_libident" class="lib_input"/>
+										</li>
+										<li style="border: none; margin-bottom: 10px;">
+											<em class="iconfont" style="width: 84px;">
+											</em>
+											<input type="text" readonly="true" value="test" style="width: 232px;" id="getli_libident"/>
+										</li>-->
+										</div>
+									</ul>
+									<a class="red-btn go-login btnlogin login-button" style="font-size: 18px;" href="javascript:gotoliblist();">申请绑定身份</a>
+								</div>
+							</div>
+							<div class="normal-login hidden" id="lib_list">
+								<div>
+									<ul>
+										<li>
+											<em class="iconfont">
+												<p class="icon-building"></p>
+											</em>
+											<select id="libselect">
+											</select>
+										</li>
+										<li>
+											<em class="iconfont">
+												<p class="icon-user"></p>
+											</em>
+											<input type="text" value="" id="lib_username" placeholder="请输入图书馆内账号" tabindex="1"/>
+										</li>
+										<li>
+											<em class="iconfont">
+												<p class="icon-key"></p>
+											</em>
+											<input type="text" value="" id="lib_userpassword" placeholder="请输入图书馆内密码" tabindex="2"/>
+										</li>
+									</ul>
+									<a class="red-btn go-login btnlogin login-button" href="javascript:AppIdent();" style="margin-bottom: 10px;">提交</a>
+									<a class="red-btn go-login btnlogin login-button" href="javascript:gogetlib_account();">取消</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css/font-awesome-ie7.min.css" />
+		<link rel="stylesheet" href="css/font-awesome.min.css" />
+		<link rel="stylesheet" href="css/auth.css" />
+		<link rel="stylesheet" href="css/base.css" />
+		<!--<link rel="stylesheet" href="css/style.css" />-->
+		<link rel="stylesheet" href="css/main.css" />
+		<script type="text/javascript" src="js/jquery-min.js" ></script>
+		<title>EBR电子图书典藏系统-检索</title>
+	</head>
+	<script type="text/javascript">
+		function GetQueryString(name){
+		     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+		     var r = window.location.search.substr(1).match(reg);
+		     if(r!=null)return  unescape(r[2]); return null;
+		}
+		function more(){
+			if($("#sc_adv").css("display")=="none"){
+				$("#sc_adv").css("display","block");
+			}
+			else{
+				$("#sc_adv").css("display","none");
+			}
+		}
+		window.onload=function(){
+			if()
+			$("#keyword").val(GetQueryString("keyword"));
+			$("#page").val(GetQueryString("page"));
+			$("#mode").val(GetQueryString("mode"));
+			$("#needlines").val(GetQueryString("needlines"));
+			$("#vid").val(GetQueryString("vid"));
+			$("#author").val(GetQueryString("author"));
+			$("#press").val(GetQueryString("press"));
+			$("#havSrcData").val(GetQueryString("havSrcData"));
+			$("#dateStart").val(GetQueryString("dateStart"));
+			$("#dateEnd").val(GetQueryString("dateEnd"));
+			if(GetQueryString("havSrcData")=="checked"){
+				var chk = document.getElementById('havSrcDatabox');
+				chk.checked = true;
+			}
+			$.ajax({
+   				 type: 'post',
+    			url: 'http://122.224.73.226:8081/opac/search',
+    			data: $("#form").serialize(),
+    			success: function(data) {
+    				console.log(data);
+    				if(data.status=="OK"){
+    					var count="检索到总条数: "+data.totalCount;
+    					$("#totalCount").text(count);
+    				}
+    			}
+			});
+		}
+	</script>
+	<body style="height: 96%;">
+		<!--<div class="banner">
+			<a href="search.html"><img src="img/logo.png"/></a>
+			<div class="LogoTitle">EBR电子图书典藏系统</div>
+			<div class="session">
+        <span class="logined"><i class="icon-user"></i>${session.userName!}</span>
+        <span class="nosession"><i class="icon-signin"></i>未登录</span>
+</div>
+		</div>-->
+		<div class="wrapper">
+			<div class="u">
+				<span class="nosession" style="font-size: 20px;color: #AAAAAA;margin-right: 20px;"><i class="icon-signin"></i>未登录</span>
+				<span class="logined" style="font-size: 20px ;margin-right: 20px;display: none;" id="username"><i class="icon-user" style="color: #336699;"></i></span>
+			</div>
+			<div id="line" class="u" style="z-index:1;width: 100%; border-bottom: 1px solid #ddd; top: 105px; right: 0px;"></div>
+			<div id="content">
+				<div class="content_wr">
+					<div id="m" style="top: 150px;">
+						<div id="lg" style="width: 29%;">
+							<img src="img/logo.png" style="width: 270px;height: 150px;margin-left: -180px;" id="logo"/>
+						</div>
+						<div class="resultlist">
+							<div id="bdxs_result_lists" style="margin-left: -155px;">
+								<div id="toolbar" style="width: 440px; margin-top: -10px;"><span class="nums" name="totalCount" id="totalCount"></span></div>
+								</div>
+							<div style="height: 100%;margin-top: -10px;">
+								<div id="1" class="list_item">
+									<img src="img/150.jpg" />
+									<div id="bookitem" class="bookitem">
+										<span class="title">历史上的十次货币战争
+											<span title="可阅读链接数">
+												<i class="icon-book">
+													<span class="count">11</span>
+												</i>
+											</span>
+										</span>
+									</div>
+								</div>
+								<div id="1" class="list_item">
+									<img src="img/150.jpg" />
+									<div id="bookitem" class="bookitem">
+										<span class="title">历史上的十次货币战争
+											<span title="可阅读链接数">
+												<i class="icon-book">
+													<span class="count">11</span>
+												</i>
+											</span>
+										</span>
+									</div>
+								</div>
+								<div id="1" class="list_item">
+									<img src="img/150.jpg" />
+									<div id="bookitem" class="bookitem">
+										<span class="title">历史上的十次货币战争
+											<span title="可阅读链接数">
+												<i class="icon-book">
+													<span class="count">11</span>
+												</i>
+											</span>
+										</span>
+									</div>
+								</div><div id="1" class="list_item">
+									<img src="img/150.jpg" />
+									<div id="bookitem" class="bookitem">
+										<span class="title">历史上的十次货币战争
+											<span title="可阅读链接数">
+												<i class="icon-book">
+													<span class="count">11</span>
+												</i>
+											</span>
+										</span>
+									</div>
+								</div><div id="1" class="list_item">
+									<img src="img/150.jpg" />
+									<div id="bookitem" class="bookitem">
+										<span class="title">历史上的十次货币战争
+											<span title="可阅读链接数">
+												<i class="icon-book">
+													<span class="count">11</span>
+												</i>
+											</span>
+										</span>
+									</div>
+								</div><div id="1" class="list_item">
+									<img src="img/150.jpg" />
+									<div id="bookitem" class="bookitem">
+										<span class="title">历史上的十次货币战争
+											<span title="可阅读链接数">
+												<i class="icon-book">
+													<span class="count">11</span>
+												</i>
+											</span>
+										</span>
+									</div>
+								</div>
+								
+							</div>
+						</div>
+						<form name="f" id="form" action="searchlist.html" style="top: -71px;">
+							<input type="hidden" name="page" value="" id="page"/>
+							<input type="hidden" name="mode" value="" id="mode"/>
+							<input type="hidden" name="needlines" value="" id="needlines"/>
+							<input type="hidden" name="vid" value="" id="vid"/>
+							<input type="hidden" name="havSrcData" value="" id="havSrcData"/>
+						<div id="fm">
+							<table >
+								<span class="s_ipt_wr">
+									<input type="text" name="keyword" id="keyword" maxlength="256" class="s_ipt">
+								</span>
+								<span class="s_btn_wr">
+									<input type="submit" id="su" value="搜索" class="s_btn">
+								</span>
+							</table>
+							<div class="sc_adv_triangle_down" onclick="javascript:more();">
+								<span>
+									<i class="icon-reorder"></i>
+								</span>
+							</div>
+							<div id="sc_adv" style="display: none;">
+								<table id="sc_adv_frm">
+									<div class="sc_adv_hatr">
+										<span class="sc_adv_label">作者</span>
+										<span>
+											<input style="width: 160px" name="author" id="author" placeholder="请输入作者姓名" data-type="precise" data-name="" class="sc_adv_keyword_ipt sc-input sc_adv_keyword2" maxlength="100" value="">
+										</span>
+									</div>
+									<div class="sc_adv_hatr">
+										<span class="sc_adv_label">出版社</span>
+										<span><input style="width: 160px" type="text" name="press" id="press" placeholder="请输入出版社名称" data-type="or" data-name="" class="sc_adv_keyword_ipt sc-input" maxlength="100" value=""></span></div>
+									<div class="sc_adv_hatr">
+										<span class="sc_adv_label">出版日期范围</span>
+										<span><input type="text" name="dateStart" id="dateStart" placeholder="开始时间" data-type="not" data-name="" class="sc_adv_keyword_ipt sc-input" maxlength="100" value="" style="width: 59px;"></span>
+										<span class="sc_adv_label" style="width: 8px;padding-left: 8px;">至</span>
+										<span><input type="text" placeholder="结束时间" name="dateEnd" id="dateEnd" data-type="not" data-name="" class="sc_adv_keyword_ipt sc-input" maxlength="100" value="" style="width: 59px;"></span>
+									</div>
+									<div class="sc_adv_hatr">
+										<span class="sc_adv_label">是否有全文数据</span>
+										<span><input type="checkbox"  name="havSrcDatabox" data-type="not" data-name="" class="sc_adv_keyword_ipt sc-input" style="width: 20px;" id="havSrcDatabox"></span></div>
+									<span class="sc_adv_sub s_btn_wr"><input type="submit" value="搜索" class="sc_adv_sub_btn s_btn"></span>
+									</div>
+									</table>
+						</div>
+					</div>
+					</form>
+				</div>
+				<!--<div id="content">
+				<div class="content_wr">
+					<div id="m" style="top: 16.2%;">
+						<div id="lg" style="width: 29%;">
+							<!--<img src="img/logo.png" style="width: 270px;height: 150px;margin-left: -180px;" id="logo"/>-->
+							<!--<div id="bdxs_result_lists">
+								<div id="toolbar" style="width: 440px;"><span class="nums">找到约38,100,000条相关结果</span></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			</div>-->
+		</div>
+		</div>
+		<div style="height: 100px;"></div>
+		<div class="footer">
+								ERCMS V1.0.16.1221 build 10，Copyright © 2016 杭州紫恒科技有限公司
+						</div>
+	</body>
+</html>

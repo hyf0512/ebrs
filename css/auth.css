@@ -1,0 +1,136 @@
+
+.Dlg{
+	display:none;
+	background: url("../img/trans50.png");
+	position:fixed;
+	top:0px;
+	left:0px;
+	z-index: 101;
+	width:100%;
+	height:100%;
+}
+
+.Dlg .dlgClose {
+	background: #fff;
+	position: absolute;
+	top:0px;
+	right:0px;
+	width: 50px;
+	height: 30px;
+	line-height: 30px;
+	vertical-align: middle;
+	cursor:pointer;
+}
+
+.DlgForm {
+	position: relative;
+	margin:auto;
+	background: #eee;
+	width: 450px;
+	min-height: 200px;
+	vertical-align: middle;
+	padding:0px;
+	border: 5px solid #ccc;
+
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+.formContent{
+	margin:auto;
+	display: block;
+	padding: 50px 20px 10px 20px;
+	background: #fff;
+}
+.formContent>div{
+	margin: 20px;
+}
+.formContent>div i {
+	margin: 10px;
+	color: #999;
+	font-size: 20px;
+}
+.formContent>div .memo {
+	color: #999;
+}
+.loginForm input{
+	height: 30px;
+	width:  232px;
+	padding: 3px;
+	text-align: left;
+	border: 1px solid #999;
+}
+.formContent .code{
+	width: 144px;
+}
+.regForm input{
+	height: 30px;
+	width:  282px;
+	padding: 3px;
+	text-align: left;
+	border: 1px solid #999;
+}
+.regForm select {
+	height: 30px;
+	width:  290px;
+	padding: 3px;
+}
+.formContent .smscode{
+	width: 140px;
+}
+.formContent .verifycode{
+	width: 88px;
+	height: 38px;
+	vertical-align: top;
+	background: #8FB9EB;
+	margin-top: 3px;
+}
+.formContent i{
+	width: 14px;
+	display: inline-block;
+}
+.btnRegister{
+	padding: 3px;
+	margin: 3px;
+	cursor: pointer;
+	font-size: 18px;
+	color: #369;
+	float:left;
+	margin-top:-22px;
+}
+.btnForget{
+	padding: 3px;
+	margin: 3px;
+	cursor: pointer;
+	font-size: 18px;
+	color: #369;
+	float:right;
+	margin-top:-22px;
+}
+.formContent .btnLogin{
+	padding: 3px;
+	margin: 3px;
+	cursor: pointer;
+	font-size: 18px;
+	color: #369;
+	float:left;
+	margin-top:-22px;
+}
+.DlgForm .qrlogin{
+	margin:auto;
+	display: none;
+	background: #fff;
+	padding: 30px;
+}
+.DlgForm .loginType{
+	width:50px;
+	height:50px;
+	position:absolute;
+	top:0px;
+	right:0px;
+	cursor:pointer;
+}
+button.btnGetSmscode{
+	width: 136px;
+	overflow:hidden;
+}
